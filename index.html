@@ -191,7 +191,7 @@
         function generateOrder() {
             const familyName = document.getElementById('familyName').value.trim();
             const blocks = document.querySelectorAll('.member-block');
-            let text = `🏠 【Gonna+ 點餐：${familyName}一家人】`;
+            let text = `🏠 【Gonna+ 點餐：${familyName}一家人】\n`;
 
             blocks.forEach((block, i) => {
                 const name = block.querySelector('.m-name').value.trim();
