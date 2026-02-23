@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>有空來晃３／１GonnaPlus(松菸店）點餐</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .disabled-overlay {
+            filter: grayscale(1);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .active-ring {
+            border: 2px solid #ea580c !important;
+        }
+
+        .price-tag {
+            color: #ea580c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body class="bg-stone-100 p-2 pb-10 font-sans">
+    <div class="max-w-md mx-auto bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-200">
+        <div class="p-4 bg-orange-600 text-white flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-black italic tracking-tighter">有空來晃</h1>
+                <p class="text-[10px] opacity-80">３／１GonnaPlus(松菸店）點餐</p>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] opacity-70 leading-none mb-1">預估總計(含服務費)</p>
+                <span id="grandTotalDisplay" class="text-2xl font-mono font-bold">$0</span>
+            </div>
+        </div>
+
+        <div class="p-4 space-y-4">
+            <div class="space-y-1">
+                <label class="text-[10px] font-black text-orange-600 ml-1 uppercase">Step 1. Family Name 家庭稱呼</label>
+                <input type="text" id="familyName" oninput="checkLock()"
+                    class="w-full border-2 border-orange-100 rounded-2xl p-3 focus:border-orange-500 outline-none text-base bg-orange-50/30"
+                    placeholder="例如：林家 / 王小明一家">
+            </div>
+
+            <div id="membersContainer" class="space-y-4"></div>
+
+            <div id="actionButtons" class="space-y-3 pt-2 disabled-overlay">
+                <button type="button" onclick="addMember()"
+                    class="w-full bg-orange-100 text-orange-700 font-bold py-3 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition">
+                    👤 新增下一位成員
+                </button>
+                <button type="button" onclick="generateOrder()"
+                    class="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl shadow-xl active:scale-95 transition text-lg">
+                    複製訂單 (貼至 LINE)
+                </button>
+                <p class="text-center text-[10px] text-gray-400">點擊「複製」後將自動移除金額，方便統計品項</p>
+            </div>
+        </div>
+    </div>
+
+    <template id="memberTemplate">
+        <div
+            class="member-block border-2 border-gray-100 rounded-3xl overflow-hidden bg-white shadow-sm transition-all">
+            <div class="p-4 bg-gray-50 border-b border-gray-100">
+                <label class="text-[10px] font-black text-gray-400 block mb-1 uppercase">Step 2. Who is this?
+                    成員姓名</label>
+                <input type="text"
+                    class="m-name w-full font-bold bg-white border border-gray-200 rounded-xl p-2 outline-none focus:active-ring shadow-inner"
+                    placeholder="請輸入姓名" oninput="checkMemberLock(this)">
+            </div>
+
+            <div class="member-content p-4 space-y-4 disabled-overlay">
+                <div class="m-items-list space-y-4"></div>
+                <button type="button" onclick="addItemRow(this)"
+                    class="w-full py-2 border-2 border-dashed border-gray-200 rounded-xl text-sm text-blue-500 font-bold active:bg-blue-50">+
+                    增加餐點/飲品</button>
+            </div>
+            <button onclick="removeMember(this)" class="w-full text-[10px] text-red-300 py-2">移除此成員</button>
+        </div>
+    </template>
+
+    <template id="itemTemplate">
+        <div class="item-row bg-stone-50 p-3 rounded-2xl relative border border-gray-100">
+            <div class="space-y-2">
+                <select class="i-cat w-full p-2 rounded-lg border border-gray-200 text-sm bg-white"
+                    onchange="syncItems(this)">
+                    <option value="">選擇分類</option>
+                    <option value="bowl">1. 碗沙拉</option>
+                    <option value="small">2. 小盤分享菜</option>
+                    <option value="pasta">3. 義大利麵/燉飯</option>
+                    <option value="protein">4. 好的蛋白質</option>
+                    <option value="sweet">5. 自製甜點</option>
+                    <option value="drink_gen">6. 飲品/氣泡水</option>
+                    <option value="drink_juice">7. 天然果汁</option>
+                    <option value="drink_tea">8. TEA 茶類</option>
+                    <option value="drink_coffee">9. COFFEE 咖啡</option>
+                </select>
+                <select
+                    class="i-dish w-full p-2 rounded-lg border border-gray-200 text-sm bg-white font-medium"></select>
+                <input type="text" class="i-note w-full p-2 rounded-lg border border-gray-200 text-xs"
+                    placeholder="備註 (如：去冰/不蔥/過敏)">
+            </div>
+            <button onclick="removeItem(this)"
+                class="absolute -right-1 -top-1 bg-white border border-gray-200 text-gray-400 rounded-full w-6 h-6 flex items-center justify-center shadow-sm">✕</button>
+        </div>
+    </template>
+
+    <script>
+        const menuData = {
+            "bowl": [{ n: "健康味噌油醋羽衣甘藍沙拉", p: 430 }, { n: "超美麗女神酪梨沙拉", p: 450 }, { n: "新鮮無花果烤雞肉溫沙拉", p: 480 }, { n: "烤野菜柑橘鴨胸溫沙拉", p: 480 }, { n: "西班牙生火腿佐新鮮布拉塔", p: 480 }],
+            "small": [{ n: "鯷魚炒青花菜佐櫻花蝦", p: 190 }, { n: "炙烤玉米排佐藍紋乳酪", p: 190 }, { n: "酥香南瓜佐白松露與優格", p: 210 }, { n: "馬鈴薯烘蛋佐西西里燉菜", p: 210 }, { n: "超節條薯條與松露蛋黃醬", p: 240 }, { n: "手作天然酵母麵包盤", p: 240 }, { n: "炙烤白花椰菜佐費達乳酪", p: 240 }, { n: "新鮮酪梨與台北最好的酸麵包", p: 240 }, { n: "油漬蕃茄生火腿普切塔", p: 240 }, { n: "布拉塔乳酪與台北最好的酸麵包", p: 270 }, { n: "經典優格燕麥炸雞們", p: 320 }, { n: "那不勒斯風味炙烤章魚", p: 320 }, { n: "爐烤布里乳酪佐新鮮無花果", p: 320 }, { n: "油封廣島牡蠣佐大蒜麵包", p: 320 }, { n: "炙燒海蝦羽衣甘藍", p: 350 }, { n: "義式杜蘭小麥酥炸中卷", p: 350 }, { n: "大蒜奶油燴淡菜", p: 350 }, { n: "每日自製精選湯", p: 120 }],
+            "pasta": [{ n: "培根蛋黃大水管麵", p: 390 }, { n: "熱那亞青醬與絲絨乳酪琴弦麵", p: 390 }, { n: "日曬蕃茄野菜裸麥緞帶麵", p: 390 }, { n: "蛤蜊與櫻花蝦墨魚琴弦麵", p: 460 }, { n: "松露野菇雞肉緞帶麵", p: 460 }, { n: "慢慢燉牛頰肉大水管麵", p: 460 }, { n: "南義海鮮多多墨魚琴弦麵", p: 520 }, { n: "櫻桃鴨胸佐紅酒甜菜法羅麥燉飯", p: 520 }, { n: "栗子野菇法羅麥燉飯", p: 590 }, { n: "超澎湃海鮮法羅麥燉飯", p: 590 }],
+            "protein": [{ n: "gonna+ 和牛漢堡與薯條", p: 680 }, { n: "乾式熟成黑毛豬里肌佐無花果乾醬汁", p: 720 }, { n: "西西里鐵鍋烤魚佐鷹嘴豆泥", p: 720 }, { n: "火烤紐西蘭羔羊排佐阿根廷青醬", p: 920 }, { n: "澳洲肋眼心 8oz 佐青醬與大蒜薯條", p: 980 }, { n: "澳洲安格斯老饕牛排 8oz 與玉米糕", p: 1280 }],
+            "sweet": [{ n: "提拉米蘇", p: 180 }, { n: "胡蘿蔔蛋糕", p: 190 }, { n: "鐵觀音楊桃戚風蛋糕", p: 190 }, { n: "琥珀奶茶巴斯克", p: 280 }, { n: "森韻抹茶栗子戚風", p: 280 }, { n: "焦糖海鹽布朗尼與香草冰淇淋", p: 280 }, { n: "伯爵茶凍蘋果帕菲", p: 360 }],
+            "drink_gen": [{ n: "巧克力歐蕾 (冰/熱)", p: 180 }, { n: "黑糖歐蕾 (冰/熱)", p: 180 }, { n: "Zestea康普茶", p: 190 }, { n: "聖沛黎洛氣泡礦泉水", p: 150 }, { n: "普娜天然礦泉水", p: 150 }],
+            "drink_juice": [{ n: "橘 - 胡蘿蔔蘋果汁", p: 170 }, { n: "黃 - 鳳梨萊姆汁", p: 170 }, { n: "紫 - 甜菜根蘋果汁", p: 170 }],
+            "drink_tea": [{ n: "法式藍伯爵茶", p: 180 }, { n: "歌劇院水果綠茶", p: 180 }, { n: "紅色馬可波羅茶", p: 180 }, { n: "南非波本香草茶", p: 180 }],
+            "drink_coffee": [{ n: "濃縮咖啡", p: 150 }, { n: "美式咖啡", p: 150 }, { n: "拿鐵", p: 180 }, { n: "卡布奇諾", p: 180 }, { n: "西西里咖啡", p: 190 }, { n: "摩卡", p: 190 }, { n: "肉桂拿鐵", p: 190 }, { n: "黑糖拿鐵", p: 190 }]
+        };
+
+        function checkMemberLock(input) {
+            const content = input.parentElement.nextElementSibling;
+            if (input.value.trim() !== "") {
+                content.classList.remove('disabled-overlay');
+                input.classList.add('active-ring');
+            } else {
+                content.classList.add('disabled-overlay');
+                input.classList.remove('active-ring');
+            }
+            checkLock();
+        }
+
+        function checkLock() {
+            const familyName = document.getElementById('familyName').value.trim();
+            const anyName = Array.from(document.querySelectorAll('.m-name')).some(i => i.value.trim() !== "");
+            const buttons = document.getElementById('actionButtons');
+            if (familyName !== "" && anyName) {
+                buttons.classList.remove('disabled-overlay');
+            } else {
+                buttons.classList.add('disabled-overlay');
+            }
+        }
+
+        function addMember() {
+            const container = document.getElementById('membersContainer');
+            const clone = document.getElementById('memberTemplate').content.cloneNode(true);
+            const memberDiv = clone.querySelector('.member-block');
+            container.appendChild(clone);
+            addItemRow(memberDiv.querySelector('button[onclick="addItemRow(this)"]'));
+            checkLock();
+        }
+
+        function removeMember(btn) {
+            btn.closest('.member-block').remove();
+            updateTotal();
+            checkLock();
+        }
+
+        function addItemRow(btn) {
+            const list = btn.previousElementSibling;
+            list.appendChild(document.getElementById('itemTemplate').content.cloneNode(true));
+            updateTotal();
+        }
+
+        function removeItem(btn) {
+            btn.parentElement.remove();
+            updateTotal();
+        }
+
+        function syncItems(catSelect) {
+            const dishSelect = catSelect.nextElementSibling;
+            const cat = catSelect.value;
+            if (!cat) return;
+            // 介面上顯示金額
+            dishSelect.innerHTML = menuData[cat].map(item => `<option value="${item.n}" data-price="${item.p}">${item.n} ($${item.p})</option>`).join('');
+            updateTotal();
+        }
+
+        function updateTotal() {
+            let subtotal = 0;
+            document.querySelectorAll('.i-dish').forEach(s => {
+                if (s.selectedOptions[0]) subtotal += parseInt(s.selectedOptions[0].dataset.price || 0);
+            });
+            const total = subtotal + Math.round(subtotal * 0.1);
+            document.getElementById('grandTotalDisplay').innerText = `$${total}`;
+        }
+
+        function generateOrder() {
+            const familyName = document.getElementById('familyName').value.trim();
+            const blocks = document.querySelectorAll('.member-block');
+            let text = `🏠 【Gonna+ 點餐：${familyName}】\n━━━━━━━\n`;
+
+            blocks.forEach((block, i) => {
+                const name = block.querySelector('.m-name').value.trim();
+                if (!name) return;
+                text += `👤 ${name}：\n`;
+                block.querySelectorAll('.item-row').forEach(item => {
+                    const dishEl = item.querySelector('.i-dish');
+                    if (dishEl.value) {
+                        const note = item.querySelector('.i-note').value.trim();
+                        // 這裡只取品項名稱，不取括號內的金額
+                        text += `  ◦ ${dishEl.value}\n`;
+                        if (note) text += `    備註：${note}\n`;
+                    }
+                });
+                if (i < blocks.length - 1) text += ` ┈┈┈┈┈\n`;
+            });
+            text += `━━━━━━━`;
+            navigator.clipboard.writeText(text).then(() => { alert('訂單已複製(不含金額)！'); });
+        }
+
+        addMember();
+    </script>
+</body>
+
+</html>
