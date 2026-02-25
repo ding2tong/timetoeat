@@ -7,7 +7,6 @@
     <title>Gonna+ 點餐系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 改用透明度來暗示鎖定，而不是關閉點擊功能 */
         .locked-visual {
             opacity: 0.4;
             filter: grayscale(1);
@@ -17,12 +16,11 @@
             border: 2px solid #ea580c !important;
         }
 
-        /* iPhone Safari 鍵盤專用優化 */
+        /* 確保 iPhone 鍵盤彈出且不自動縮放 */
         input,
         select,
         textarea {
             font-size: 16px !important;
-            /* 核心：防止縮放且喚起鍵盤 */
             -webkit-user-select: text;
             user-select: text;
         }
@@ -48,9 +46,10 @@
 
         <div class="p-4 space-y-5">
             <div class="space-y-1">
-                <label class="text-[10px] font-black text-orange-600 ml-1 uppercase">Step 1. Family Name 家庭稱呼</label>
-                <input type="text" id="familyName" autocomplete="off" autocorrect="off" inputmode="text"
-                    oninput="checkLock()"
+                <label class="text-[10px] font-black text-orange-600 ml-1 uppercase tracking-widest">Step 1. 填 寫 類 別 / 稱
+                    呼</label>
+                <input type="text" id="f_ref_id" name="f_ref_id" autocomplete="new-password" autocorrect="off"
+                    spellcheck="false" inputmode="text" oninput="checkLock()"
                     class="w-full border-2 border-orange-100 rounded-2xl p-3 focus:border-orange-500 outline-none text-base bg-orange-50/30"
                     placeholder="例如：林家">
             </div>
@@ -73,12 +72,12 @@
     <template id="memberTemplate">
         <div class="member-block border-2 border-gray-100 rounded-3xl overflow-hidden bg-white shadow-sm mb-4">
             <div class="p-4 bg-gray-50 border-b border-gray-100">
-                <label class="text-[10px] font-black text-gray-400 block mb-1 uppercase">Step 2. Member Name
-                    成員姓名</label>
+                <label class="text-[10px] font-black text-gray-400 block mb-1 uppercase tracking-widest">Step 2. 登 記 點 餐
+                    人</label>
                 <input type="text"
                     class="m-name w-full font-bold bg-white border border-gray-200 rounded-xl p-2 outline-none focus:active-ring"
-                    autocomplete="off" autocorrect="off" inputmode="text" placeholder="請輸入姓名以點餐"
-                    oninput="checkMemberLock(this)">
+                    name="u_ref_code" autocomplete="new-password" autocorrect="off" spellcheck="false" inputmode="text"
+                    placeholder="請輸入文字" oninput="checkMemberLock(this)">
             </div>
 
             <div class="member-content p-4 space-y-4 locked-visual">
@@ -150,7 +149,7 @@
         }
 
         function checkLock() {
-            const familyName = document.getElementById('familyName').value.trim();
+            const familyName = document.getElementById('f_ref_id').value.trim();
             const anyName = Array.from(document.querySelectorAll('.m-name')).some(i => i.value.trim() !== "");
             const buttons = document.getElementById('actionButtons');
             if (familyName !== "" && anyName) {
@@ -165,7 +164,6 @@
             const clone = document.getElementById('memberTemplate').content.cloneNode(true);
             const memberDiv = clone.querySelector('.member-block');
             container.appendChild(clone);
-            // 初始化時不自動加餐點行，等填了名再手動加
             checkLock();
         }
 
@@ -204,10 +202,10 @@
         }
 
         function generateOrder() {
-            const familyName = document.getElementById('familyName').value.trim();
+            const familyName = document.getElementById('f_ref_id').value.trim();
             if (!familyName) { alert("請填寫家庭名稱！"); return; }
             const blocks = document.querySelectorAll('.member-block');
-            let text = `🏠 【Gonna+ 點餐：${familyName}一家】\n━━━━━━━\n`;
+            let text = `🏠 【Gonna+ 點餐：${familyName}一家】`;
 
             blocks.forEach((block, i) => {
                 const name = block.querySelector('.m-name').value.trim();
@@ -221,9 +219,9 @@
                         if (note) text += `    備註：${note}\n`;
                     }
                 });
-                if (i < blocks.length - 1) text += ` ┈┈┈┈┈┈┈\n`;
+                if (i < blocks.length - 1) text += ` ┈┈┈┈┈┈┈┈┈┈┈┈\n`;
             });
-            text += `━━━━━━━`;
+            ｓ
 
             const textArea = document.createElement("textarea");
             textArea.value = text;
@@ -236,7 +234,6 @@
             alert('訂單品項已複製！');
         }
 
-        // 初始化加入第一個人
         addMember();
     </script>
 </body>
