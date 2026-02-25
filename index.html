@@ -16,17 +16,21 @@
             border: 2px solid #ea580c !important;
         }
 
-        /* 確保 iPhone 鍵盤彈出且不自動縮放 */
+        /* 強制文字框高度，讓 textarea 看起來像 input */
+        .fake-input {
+            min-height: 48px;
+            max-height: 48px;
+            resize: none;
+            line-height: 24px;
+            overflow: hidden;
+        }
+
         input,
-        select,
-        textarea {
+        textarea,
+        select {
             font-size: 16px !important;
             -webkit-user-select: text;
             user-select: text;
-        }
-
-        .click-btn:active {
-            transform: scale(0.98);
         }
     </style>
 </head>
@@ -46,25 +50,22 @@
 
         <div class="p-4 space-y-5">
             <div class="space-y-1">
-                <label class="text-[10px] font-black text-orange-600 ml-1 uppercase tracking-widest">Step 1. 填 寫 類 別 / 稱
+                <label class="text-[10px] font-black text-orange-600 ml-1 uppercase tracking-widest">Step 1. 類 別 / 稱
                     呼</label>
-                <input type="text" id="f_ref_id" name="f_ref_id" autocomplete="new-password" autocorrect="off"
-                    spellcheck="false" inputmode="text" oninput="checkLock()"
-                    class="w-full border-2 border-orange-100 rounded-2xl p-3 focus:border-orange-500 outline-none text-base bg-orange-50/30"
-                    placeholder="例如：林家">
+                <textarea id="f_ref_id"
+                    class="fake-input w-full border-2 border-orange-100 rounded-2xl p-3 focus:border-orange-500 outline-none text-base bg-orange-50/30"
+                    placeholder="例如：林家" oninput="checkLock()"></textarea>
             </div>
 
             <div id="membersContainer" class="space-y-4"></div>
 
             <div id="actionButtons" class="space-y-3 pt-2 locked-visual">
                 <button type="button" onclick="addMember()"
-                    class="w-full bg-orange-100 text-orange-700 font-bold py-4 rounded-2xl flex items-center justify-center click-btn transition">
-                    👤 新增下一位成員
-                </button>
+                    class="w-full bg-orange-100 text-orange-700 font-bold py-4 rounded-2xl flex items-center justify-center">👤
+                    新增下一位成員</button>
                 <button type="button" onclick="generateOrder()"
-                    class="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl shadow-xl click-btn transition text-lg">
-                    複製訂單 (貼至 LINE)
-                </button>
+                    class="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl shadow-xl text-lg">複製訂單 (貼至
+                    LINE)</button>
             </div>
         </div>
     </div>
@@ -72,18 +73,17 @@
     <template id="memberTemplate">
         <div class="member-block border-2 border-gray-100 rounded-3xl overflow-hidden bg-white shadow-sm mb-4">
             <div class="p-4 bg-gray-50 border-b border-gray-100">
-                <label class="text-[10px] font-black text-gray-400 block mb-1 uppercase tracking-widest">Step 2. 登 記 點 餐
+                <label class="text-[10px] font-black text-gray-400 block mb-1 uppercase tracking-widest">Step 2. 登 記
                     人</label>
-                <input type="text"
-                    class="m-name w-full font-bold bg-white border border-gray-200 rounded-xl p-2 outline-none focus:active-ring"
-                    name="u_ref_code" autocomplete="new-password" autocorrect="off" spellcheck="false" inputmode="text"
-                    placeholder="請輸入文字" oninput="checkMemberLock(this)">
+                <textarea
+                    class="m-name fake-input w-full font-bold bg-white border border-gray-200 rounded-xl p-2 outline-none focus:active-ring"
+                    placeholder="請輸入文字" oninput="checkMemberLock(this)"></textarea>
             </div>
 
             <div class="member-content p-4 space-y-4 locked-visual">
                 <div class="m-items-list space-y-4"></div>
                 <button type="button" onclick="handleAddItem(this)"
-                    class="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm text-blue-600 font-bold active:bg-blue-50">+
+                    class="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm text-blue-600 font-bold">+
                     增加餐點/飲品</button>
             </div>
             <button onclick="removeMember(this)" class="w-full text-[10px] text-red-300 py-3">移除此成員</button>
@@ -121,16 +121,16 @@
             "small": [{ n: "鯷魚炒青花菜佐櫻花蝦", p: 190 }, { n: "炙烤玉米排佐藍紋乳酪", p: 190 }, { n: "酥香南瓜佐白松露與優格", p: 210 }, { n: "馬鈴薯烘蛋佐西西里燉菜", p: 210 }, { n: "超節條薯條與松露蛋黃醬", p: 240 }, { n: "手作天然酵母麵包盤", p: 240 }, { n: "炙烤白花椰菜佐費達乳酪", p: 240 }, { n: "新鮮酪梨與台北最好的酸麵包", p: 240 }, { n: "油漬蕃茄生火腿普切塔", p: 240 }, { n: "布拉塔乳酪與台北最好的酸麵包", p: 270 }, { n: "經典優格燕麥炸雞們", p: 320 }, { n: "那不勒斯風味炙烤章魚", p: 320 }, { n: "爐烤布里乳酪佐新鮮無花果", p: 320 }, { n: "油封廣島牡蠣佐大蒜麵包", p: 320 }, { n: "炙燒海蝦羽衣甘藍", p: 350 }, { n: "義式杜蘭小麥酥炸中卷", p: 350 }, { n: "大蒜奶油燴淡菜", p: 350 }, { n: "每日自製精選湯", p: 120 }],
             "pasta": [{ n: "培根蛋黃大水管麵", p: 390 }, { n: "熱那亞青醬與絲絨乳酪琴弦麵", p: 390 }, { n: "日曬蕃茄野菜裸麥緞帶麵", p: 390 }, { n: "蛤蜊與櫻花蝦墨魚琴弦麵", p: 460 }, { n: "松露野菇雞肉緞帶麵", p: 460 }, { n: "慢慢燉牛頰肉大水管麵", p: 460 }, { n: "南義海鮮多多墨魚琴弦麵", p: 520 }, { n: "櫻桃鴨胸佐紅酒甜菜法羅麥燉飯", p: 520 }, { n: "栗子野菇法羅麥燉飯", p: 590 }, { n: "超澎湃海鮮法羅麥燉飯", p: 590 }],
             "protein": [{ n: "gonna+ 和牛漢堡與薯條", p: 680 }, { n: "乾式熟成黑毛豬里肌佐無花果乾醬汁", p: 720 }, { n: "西西里鐵鍋烤魚佐鷹嘴豆泥", p: 720 }, { n: "火烤紐西蘭羔羊排佐阿根廷青醬", p: 920 }, { n: "澳洲肋眼心 8oz 佐青醬與大蒜薯條", p: 980 }, { n: "澳洲安格斯老饕牛排 8oz 與玉米糕", p: 1280 }],
-            "sweet": [{ n: "提拉米蘇", p: 180 }, { n: "胡蘿蔔蛋糕", p: 190 }, { n: "鐵觀音楊桃戚風蛋糕", p: 190 }, { n: "琥珀奶茶巴斯克", p: 280 }, { n: "森韻抹茶栗子戚風", p: 280 }, { n: "焦糖海鹽布朗尼與香草冰淇淋", p: 280 }, { n: "伯爵茶凍蘋果帕菲", p: 360 }],
+            "sweet": [{ n: "提拉米蘇", p: 180 }, { n: "胡蘿蔔蛋糕", p: 190 }, { n: "鐵觀音楊桃戚風蛋糕", p: 190 }, { n: "琥珀奶茶巴斯克", p: 280 }, { n: "森韻抹茶栗子戚風", p: 280 }, { n: "焦 caramel 海鹽布朗尼與香草冰淇淋", p: 280 }, { n: "伯爵茶凍蘋果帕菲", p: 360 }],
             "drink_gen": [{ n: "巧克力歐蕾 (冰/熱)", p: 180 }, { n: "黑糖歐蕾 (冰/熱)", p: 180 }, { n: "Zestea康普茶", p: 190 }, { n: "聖沛黎洛氣泡礦泉水", p: 150 }, { n: "普娜天然礦泉水", p: 150 }],
             "drink_juice": [{ n: "橘 - 胡蘿蔔蘋果汁", p: 170 }, { n: "黃 - 鳳梨萊姆汁", p: 170 }, { n: "紫 - 甜菜根蘋果汁", p: 170 }],
             "drink_tea": [{ n: "法式藍伯爵茶", p: 180 }, { n: "歌劇院水果綠茶", p: 180 }, { n: "紅色馬可波羅茶", p: 180 }, { n: "南非波本香草茶", p: 180 }],
             "drink_coffee": [{ n: "濃縮咖啡", p: 150 }, { n: "美式咖啡", p: 150 }, { n: "拿鐵", p: 180 }, { n: "卡布奇諾", p: 180 }, { n: "西西里咖啡", p: 190 }, { n: "摩卡", p: 190 }, { n: "肉桂拿鐵", p: 190 }, { n: "黑糖拿鐵", p: 190 }]
         };
 
-        function checkMemberLock(input) {
-            const content = input.parentElement.nextElementSibling;
-            if (input.value.trim() !== "") {
+        function checkMemberLock(textarea) {
+            const content = textarea.parentElement.nextElementSibling;
+            if (textarea.value.trim() !== "") {
                 content.classList.remove('locked-visual');
             } else {
                 content.classList.add('locked-visual');
@@ -141,7 +141,7 @@
         function handleAddItem(btn) {
             const memberInput = btn.closest('.member-block').querySelector('.m-name');
             if (memberInput.value.trim() === "") {
-                alert("請先輸入姓名再點餐！");
+                alert("請輸入登記人文字！");
                 memberInput.focus();
                 return;
             }
@@ -162,7 +162,6 @@
         function addMember() {
             const container = document.getElementById('membersContainer');
             const clone = document.getElementById('memberTemplate').content.cloneNode(true);
-            const memberDiv = clone.querySelector('.member-block');
             container.appendChild(clone);
             checkLock();
         }
@@ -203,7 +202,7 @@
 
         function generateOrder() {
             const familyName = document.getElementById('f_ref_id').value.trim();
-            if (!familyName) { alert("請填寫家庭名稱！"); return; }
+            if (!familyName) { alert("請填寫類別！"); return; }
             const blocks = document.querySelectorAll('.member-block');
             let text = `🏠 【Gonna+ 點餐：${familyName}一家】`;
 
@@ -221,7 +220,6 @@
                 });
                 if (i < blocks.length - 1) text += ` ┈┈┈┈┈┈┈┈┈┈┈┈\n`;
             });
-            ｓ
 
             const textArea = document.createElement("textarea");
             textArea.value = text;
