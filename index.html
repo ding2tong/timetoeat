@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gonna+ 松菸店聚餐點餐</title>
+    <title>Gonna+ 點餐系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 防止 iPhone 點擊縮放與灰階濾鏡 */
-        .disabled-overlay {
+        /* 灰階鎖定效果 */
+        .disabled-section {
             filter: grayscale(1);
             opacity: 0.5;
             pointer-events: none;
@@ -18,14 +18,18 @@
             border: 2px solid #ea580c !important;
         }
 
+        /* 確保 iPhone 鍵盤彈出且不縮放 */
         input,
         select {
             font-size: 16px !important;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
-        /* 防止 iOS 自動縮放 */
-        .no-select {
-            -webkit-tap-highlight-color: transparent;
+        /* 點擊回饋 */
+        .click-effect:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -35,7 +39,7 @@
 
         <div class="p-5 bg-orange-600 text-white flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-black italic tracking-tighter text-white">Gonna+</h1>
+                <h1 class="text-2xl font-black italic tracking-tighter">Gonna+</h1>
                 <p class="text-[10px] opacity-90 font-medium">3/1 松菸店聚餐統計</p>
             </div>
             <div class="text-right">
@@ -46,26 +50,24 @@
 
         <div class="p-4 space-y-5">
             <div class="space-y-1">
-                <label class="text-[10px] font-black text-orange-600 ml-1 uppercase tracking-wider">Step 1. Family Name
-                    家庭稱呼</label>
-                <input type="text" id="familyName" name="f_addr_random" autocomplete="one-time-code" autocorrect="off"
-                    spellcheck="false" oninput="checkLock()"
+                <label class="text-[10px] font-black text-orange-600 ml-1 uppercase">Step 1. Family Name 家庭稱呼</label>
+                <input type="text" id="familyName" autocomplete="off" inputmode="text" oninput="checkLock()"
                     class="w-full border-2 border-orange-100 rounded-2xl p-3 focus:border-orange-500 outline-none text-base bg-orange-50/30"
                     placeholder="例如：林家 / 王小明一家">
             </div>
 
             <div id="membersContainer" class="space-y-4"></div>
 
-            <div id="actionButtons" class="space-y-3 pt-2 disabled-overlay">
+            <div id="actionButtons" class="space-y-3 pt-2 disabled-section">
                 <button type="button" onclick="addMember()"
-                    class="w-full bg-orange-100 text-orange-700 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition no-select">
+                    class="w-full bg-orange-100 text-orange-700 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 click-effect transition">
                     👤 新增下一位成員
                 </button>
                 <button type="button" onclick="generateOrder()"
-                    class="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl shadow-xl active:scale-95 transition text-lg no-select">
+                    class="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl shadow-xl click-effect transition text-lg">
                     複製訂單 (貼至 LINE)
                 </button>
-                <p class="text-center text-[10px] text-gray-400 font-medium">※ 複製內容不包含金額，僅供品項統計</p>
+                <p class="text-center text-[10px] text-gray-400 font-medium">※ 複製內容不包含金額</p>
             </div>
         </div>
     </div>
@@ -74,18 +76,17 @@
         <div
             class="member-block border-2 border-gray-100 rounded-3xl overflow-hidden bg-white shadow-sm transition-all mb-4">
             <div class="p-4 bg-gray-50 border-b border-gray-100">
-                <label class="text-[10px] font-black text-gray-400 block mb-1 uppercase tracking-wider">Step 2. Who is
-                    this? 成員姓名</label>
+                <label class="text-[10px] font-black text-gray-400 block mb-1 uppercase">Step 2. Member Name
+                    成員姓名</label>
                 <input type="text"
                     class="m-name w-full font-bold bg-white border border-gray-200 rounded-xl p-2 outline-none focus:active-ring shadow-inner"
-                    name="m_code_random" autocomplete="one-time-code" autocorrect="off" spellcheck="false"
-                    placeholder="請輸入姓名以解鎖點餐" oninput="checkMemberLock(this)">
+                    autocomplete="off" inputmode="text" placeholder="請輸入姓名以解鎖點餐" oninput="checkMemberLock(this)">
             </div>
 
-            <div class="member-content p-4 space-y-4 disabled-overlay">
+            <div class="member-content p-4 space-y-4 disabled-section">
                 <div class="m-items-list space-y-4"></div>
                 <button type="button" onclick="addItemRow(this)"
-                    class="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm text-blue-600 font-bold active:bg-blue-50">+
+                    class="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm text-blue-600 font-bold click-effect">+
                     增加餐點/飲品</button>
             </div>
             <button onclick="removeMember(this)"
@@ -112,7 +113,7 @@
                 <select
                     class="i-dish w-full p-2 rounded-lg border border-gray-200 text-sm bg-white font-bold text-gray-700"></select>
                 <input type="text" class="i-note w-full p-2 rounded-lg border border-gray-200 text-xs"
-                    autocomplete="off" autocorrect="off" placeholder="備註 (如：去冰/不蔥/過敏)">
+                    autocomplete="off" placeholder="備註 (如：去冰/不蔥/過敏)">
             </div>
             <button onclick="removeItem(this)"
                 class="absolute -right-2 -top-2 bg-white border border-gray-200 text-gray-400 rounded-full w-7 h-7 flex items-center justify-center shadow-md">✕</button>
@@ -135,10 +136,10 @@
         function checkMemberLock(input) {
             const content = input.parentElement.nextElementSibling;
             if (input.value.trim() !== "") {
-                content.classList.remove('disabled-overlay');
+                content.classList.remove('disabled-section');
                 input.classList.add('active-ring');
             } else {
-                content.classList.add('disabled-overlay');
+                content.classList.add('disabled-section');
                 input.classList.remove('active-ring');
             }
             checkLock();
@@ -149,11 +150,10 @@
             const memberInputs = Array.from(document.querySelectorAll('.m-name'));
             const anyNameFilled = memberInputs.some(input => input.value.trim() !== "");
             const buttons = document.getElementById('actionButtons');
-
             if (familyName !== "" && anyNameFilled) {
-                buttons.classList.remove('disabled-overlay');
+                buttons.classList.remove('disabled-section');
             } else {
-                buttons.classList.add('disabled-overlay');
+                buttons.classList.add('disabled-section');
             }
         }
 
@@ -187,7 +187,6 @@
             const dishSelect = catSelect.nextElementSibling;
             const cat = catSelect.value;
             if (!cat) return;
-            // 介面選單顯示金額
             dishSelect.innerHTML = menuData[cat].map(item => `<option value="${item.n}" data-price="${item.p}">${item.n} ($${item.p})</option>`).join('');
             updateTotal();
         }
@@ -214,7 +213,6 @@
                     const dishEl = item.querySelector('.i-dish');
                     if (dishEl.value) {
                         const note = item.querySelector('.i-note').value.trim();
-                        // 僅提取品項名，不含括號內的價格
                         text += `  ◦ ${dishEl.value}\n`;
                         if (note) text += `    備註：${note}\n`;
                     }
@@ -223,21 +221,22 @@
             });
             text += `━━━━━━━━━━━━━━`;
 
-            // 複製到剪貼簿
+            // 兼容性複製
             const textArea = document.createElement("textarea");
             textArea.value = text;
+            textArea.style.position = "fixed";
             document.body.appendChild(textArea);
+            textArea.focus();
             textArea.select();
             try {
                 document.execCommand('copy');
-                alert('訂單品項已複製！請至 LINE 貼上。');
+                alert('訂單品項已複製！');
             } catch (err) {
-                alert('複製失敗，請手動選取文字。');
+                alert('複製失敗，請手動全選複製。');
             }
             document.body.removeChild(textArea);
         }
 
-        // 初始化
         addMember();
     </script>
 </body>
