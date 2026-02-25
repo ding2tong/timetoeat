@@ -204,7 +204,7 @@
             const familyName = document.getElementById('f_ref_id').value.trim();
             if (!familyName) { alert("請填寫類別！"); return; }
             const blocks = document.querySelectorAll('.member-block');
-            let text = `🏠 【Gonna+ 點餐：${familyName}一家】`;
+            let text = `🏠 【Gonna+ 點餐：${familyName}一家】\n`;
 
             blocks.forEach((block, i) => {
                 const name = block.querySelector('.m-name').value.trim();
