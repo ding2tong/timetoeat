@@ -207,7 +207,7 @@
             const familyName = document.getElementById('familyName').value.trim();
             if (!familyName) { alert("請填寫家庭名稱！"); return; }
             const blocks = document.querySelectorAll('.member-block');
-            let text = `🏠 【Gonna+ 點餐：${familyName}】\n━━━━━━━━━━━━━━\n`;
+            let text = `🏠 【Gonna+ 點餐：${familyName}一家】\n━━━━━━━\n`;
 
             blocks.forEach((block, i) => {
                 const name = block.querySelector('.m-name').value.trim();
@@ -221,9 +221,9 @@
                         if (note) text += `    備註：${note}\n`;
                     }
                 });
-                if (i < blocks.length - 1) text += ` ┈┈┈┈┈┈┈┈┈┈┈┈\n`;
+                if (i < blocks.length - 1) text += ` ┈┈┈┈┈┈┈\n`;
             });
-            text += `━━━━━━━━━━━━━━`;
+            text += `━━━━━━━`;
 
             const textArea = document.createElement("textarea");
             textArea.value = text;
